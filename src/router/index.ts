@@ -10,6 +10,11 @@ const router = createRouter({
       component: index,
     },
     {
+      path: '/create',
+      name: 'create',
+      component: () => import("@/pages/create.vue")
+    },
+    {
       path: '/editor',
       name: 'editor',
       // route level code-splitting
