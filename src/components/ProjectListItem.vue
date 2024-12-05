@@ -4,7 +4,8 @@
   import { useRouter } from 'vue-router';
 
   const props = defineProps<{
-    project: ProjectType
+    project: ProjectType,
+    index: number
   }>()
 
   const router = useRouter()
@@ -49,8 +50,8 @@
 
 <template>
   <button 
-    class="w-full first:rounded-t-md bg-green-200 dark:bg-green-800 hover:bg-slate-200 dark:hover:bg-slate-800 border-b border-b-slate-500 transition-colors"
-    @click="() => {router.push(`/editor?project=${project.name}`)}"
+    class="w-full first:rounded-t-md bg-green-200 dark:bg-green-800 hover:bg-slate-200 dark:hover:bg-slate-800 focus:bg-slate-200 dark:focus:bg-slate-800 border-b border-b-slate-500 motion-safe:transition-colors"
+    @click="() => {router.push(`/editor?project=${index}`)}"
   >
     <div class="w-full px-2 py-1">
       <div class="text-left text-lg font-bold">{{ project.name }}</div>

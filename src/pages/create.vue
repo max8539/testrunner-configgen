@@ -12,6 +12,7 @@
   const projectName = ref("")
   const configStr = ref("")
   const isSubmitNew = ref(false)
+  const showConfigError = ref(false)
   const showJsonError = ref(false)
 
   const createExisting = () => {
@@ -36,28 +37,44 @@
     }
   }
   const createNew = () => {
-    storageData.value = {
-      projects: [
-        {
-          name: projectName.value,
-          lastModified: Date.now(),
-          exported: false,
-          showErrors: false,
-          config: {
-            verbose: 1,
-            first_failure_exit: false,
-            score_exit_code: false,
-            tests: [{
-              expect_error: false,
-              run_cmd: "",
-              skip: false
-            }]
-          }
-        },
-        ...storageData.value.projects
-      ]
-    }
-    router.push(`/editor?project=${projectName.value}`)
+    storageData.value.projects.push({
+      name: projectName.value,
+      lastModified: Date.now(),
+      exported: false,
+      showErrors: false,
+      config: {
+        verbose: 1,
+        first_failure_exit: false,
+        score_exit_code: false,
+        tests: [{
+          expect_error: false,
+          run_cmd: "",
+          skip: false
+        }]
+      }
+    })
+    // storageData.value = {
+    //   projects: [
+    //     ...storageData.value.projects,
+    //     {
+    //       name: projectName.value,
+    //       lastModified: Date.now(),
+    //       exported: false,
+    //       showErrors: false,
+    //       config: {
+    //         verbose: 1,
+    //         first_failure_exit: false,
+    //         score_exit_code: false,
+    //         tests: [{
+    //           expect_error: false,
+    //           run_cmd: "",
+    //           skip: false
+    //         }]
+    //       }
+    //     }
+    //   ]
+    // }
+    router.push(`/editor?project=${storageData.value.projects.length - 1}`)
   }
 
   const submitForm = () => {
@@ -72,11 +89,10 @@
 <template>
   <div>
     <div class="text-left pb-2">
-
+      <Button text as="router-link" to="/" label="Back to Homepage" />
     </div>
-    <Button text as="router-link" to="/" label="Back" />
     <h1 class="pb-4 text-center text-4xl font-bold">Add New Project</h1>
-    <form class="w-full max-w-[960px] mx-auto" @submit.prevent="submitForm">
+    <form class="w-full mx-auto" @submit.prevent="submitForm">
       <div class="pb-4">
         <label class="font-bold" for="create-name">Project Name</label>
         <InputText v-model="projectName" id="create-name" required fluid />
@@ -88,12 +104,11 @@
           <div class="pb-2">
             <label for="create-name">
               <div class="font-bold">Paste an existing configuration here</div>
-              <div class="text-xs">Copy the entire content of an existing <span class="font-mono">testconfig.json</span> file and paste it here.</div>
+              <div class="text-xs">Copy the entire content of an existing testconfig.json file and paste it here.</div>
             </label>
             <Textarea 
               v-model="configStr" 
               id="create-config" 
-              :required="!isSubmitNew"
               class="!font-mono"
               rows="10"
               fluid 
@@ -124,6 +139,29 @@
     </form>
 
     <Dialog
+      v-model:visible="showConfigError"
+      modal
+      class="w-11/12 sm:w-[37rem]"
+    >
+      <template #container>
+        <div class="p-4 text-slate-800 dark:text-slate-200">
+          <div>
+            Please provide a configuration to import.
+          </div>
+          <div class="pt-2">
+            <Button 
+              type="button"
+              text
+              label="Close"
+              autofocus
+              class="block"
+              @click="() => {showConfigError = false}"
+            />
+          </div>
+        </div>
+      </template>
+    </Dialog>
+    <Dialog
       v-model:visible="showJsonError"
       modal
       class="w-11/12 sm:w-[37rem]"
@@ -132,7 +170,7 @@
         <div class="p-4 text-slate-800 dark:text-slate-200">
           <div>
             An error occured while reading your configuration. Ensure that the configuration has valid JSON syntax, then try again. 
-            You may find it useful to open your <span class="font-mono">testconfig.json</span> file in a code editor and fix any issues that it identifies.
+            You may find it useful to open your testconfig.json file in a code editor and fix any issues that it identifies.
           </div>
           <div class="pt-2">
             <Button 
