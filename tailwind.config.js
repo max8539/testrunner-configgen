@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import primeui from "tailwindcss-primeui"
+
 export default {
   content: [
     "./index.html",
@@ -11,5 +13,5 @@ export default {
     },
     extend: {},
   },
-  plugins: [],
+  plugins: [primeui],
 }
